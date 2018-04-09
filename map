@@ -1,0 +1,82 @@
+#code to make a map for range paper
+#EVM 12/1/17
+
+#install package to map (leaflet), download data from GoogleSheets (gsheet), save html (htmlwidgets).drawing objects (sp)
+install.packages(c("shiny", "leaflet", "gsheet", "htmlwidgets", "sp", "tidyverse"))
+
+##get leaflet
+library(shiny)
+library(leaflet)
+library(gsheet)
+library(htmlwidgets)
+library(sp)
+library(tidyverse)
+
+#import googlesheet (or .csv )with information
+url <- 'https://docs.google.com/spreadsheets/d/1eFPE2Lro-KsNijv2yJVZ2WcGYj9hJ-5RkG92T_u5prQ/edit?usp=sharing'
+a <- gsheet2text(url)
+plantref <- read.csv(text=a) 
+
+#get lats/longs as numbers
+lat = as.numeric(as.character(plantref$latitude))
+long = as.numeric(as.character(plantref$longitude))
+
+dois = paste0("'","<a"," href", "=", plantref$DOI , " target = '_blank'", ">", "DOI</a>","'") #create hyperlinks from DOIs
+
+#make different markers for unpa and ambr
+pal = colorFactor(c("orange", "blue", "purple"), domain = c(2, 1, 3))
+
+#collapse rows into set of data for pop-up- in text citation, species, obs_type, doi
+plantref_cols = list(plantref$Citation, plantref$location, plantref$species, dois, sep = " ")
+chunks =do.call(paste, plantref_cols)
+plantref$chunks = chunks
+#aggregate references for those locations
+citations = aggregate(plantref$chunks~plantref$latitude, data = plantref, paste, collapse = "<br>")
+
+#####make data set to map from sheet with citations as chunks####
+#find where latitudes line up in plant ref, get longitude
+##get longitude indices/indicies to get one of 
+longind = match(citations[,1],plantref$latitude)
+##get longitude values
+longvalues = as.numeric(as.character(plantref$longitude[longind]))
+##get latitude vlaues
+latvalues = as.numeric(as.character(citations[,1]))
+##get label as location
+locationlabels = as.character(plantref$location[longind])
+##get species and selectedbyreader value at each location
+speciesatlocation = aggregate(plantref$species~plantref$latitude, data = plantref, paste, collapse = ',')
+
+###if it has an A, mark as 1, if it has a U, mark as 2, if it has both, mark as 3
+####find where species are
+As = grep("A", speciesatlocation[,3])
+Us = grep("U", speciesatlocation[,3])
+Both = match(As, Us)
+Bothnum = Us[Both]
+Asonly = setdiff(As, Bothnum)
+Usonly = setdiff(Us, Bothnum)
+###create species vector
+Spvec = c()
+Spvec[Asonly] = 1
+Spvec[Usonly] = 2
+Spvec[Bothnum] = 3
+
+##filled or not filled vector
+#latselectionatlocation = aggregate(plantref$selectedbyreader~plantref$latitude, data = plantref, paste, collapse = ',')
+#longselectionatlocation = aggregate(plantref$selectedbyreader~plantref$longitude, data = plantref, paste, collapse = ',')
+
+fillvec = (plantref$selectedbyreader[longind] - 1) *-1
+
+
+#make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
+#and include popup with link to paper      
+plantmap = leaflet(plantref) %>% addProviderTiles(providers$OpenStreetMap) %>%
+  addCircleMarkers(lng = longvalues, lat = latvalues,
+                   color = ~pal(Spvec),
+                   label = locationlabels,
+                   popup = citations[,2],
+                   stroke = TRUE, fillOpacity = ~fillvec)
+
+plantmap 
+
+
+saveWidget(plantmap,file ='plantmap.html', selfcontained = TRUE)  #save the html   
