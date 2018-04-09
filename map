@@ -48,8 +48,8 @@ speciesatlocation = aggregate(plantref$species~plantref$latitude, data = plantre
 
 ###if it has an A, mark as 1, if it has a U, mark as 2, if it has both, mark as 3
 ####find where species are
-As = grep("A", speciesatlocation[,3])
-Us = grep("U", speciesatlocation[,3])
+As = grep("A", speciesatlocation[,2])
+Us = grep("U", speciesatlocation[,2])
 Both = match(As, Us)
 Bothnum = Us[Both]
 Asonly = setdiff(As, Bothnum)
