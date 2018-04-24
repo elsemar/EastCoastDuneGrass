@@ -140,10 +140,9 @@ Spvec[Usonly] = 2
 Spvec[Bothnum] = 3
 
 ##filled or not filled vector
-#latselectionatlocation = aggregate(plantref$SELECTEDBYREADER~plantref$LATITUDE, data = plantref, paste, collapse = ',')
-#longselectionatlocation = aggregate(plantref$SELECTEDBYREADER~plantref$LONGITUDE, data = plantref, paste, collapse = ',')
 
-fillvec = (plantref$SELECTEDBYREADER[longind] - 1) *-1
+fillvecnum = as.numeric(plantref$SELECTEDBYREADER[longind]) 
+fillvec = (fillvecnum-1)*(-1)
 
 
 #make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
