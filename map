@@ -1,25 +1,104 @@
 #code to make a map for range paper
 #EVM 12/1/17
 
-#install package to map (leaflet), download data from GoogleSheets (gsheet), save html (htmlwidgets).drawing objects (sp)
-install.packages(c("shiny", "leaflet", "gsheet", "htmlwidgets", "sp", "tidyverse"))
+#install package to map (leaflet),  save html (htmlwidgets).drawing objects (sp)
+install.packages(c("shiny", "leaflet", "htmlwidgets", "sp", "tidyverse"))
 
 ##get leaflet
 library(shiny)
 library(leaflet)
-library(gsheet)
 library(htmlwidgets)
 library(sp)
 library(tidyverse)
 
-#import googlesheet (or .csv )with information
-url <- 'https://docs.google.com/spreadsheets/d/1eFPE2Lro-KsNijv2yJVZ2WcGYj9hJ-5RkG92T_u5prQ/edit?usp=sharing'
-a <- gsheet2text(url)
-plantref <- read.csv(text=a) 
+#import dataset from LTER network
+# Package ID: knb-lter-vcr.282.1 Cataloging System:https://pasta.edirepository.org.
+# Data set title: Locations of published studies focused on Uniola paniculata and Ammophila breviligulata along the US east coast (NJ-NC).
+# Data set creator: Dr. Evan Goldstein -  
+# Data set creator:  Elsemarie Mullins -  
+# Data set creator:  Laura Moore -  
+# Data set creator:  Reuben Biel -  
+# Data set creator:  Joseph Brown -  
+# Data set creator:  Sally Hacker -  
+# Data set creator:  Katya Jay -  
+# Data set creator:  Rebecca Mostow -  
+# Data set creator:  Peter Ruggiero -  
+# Data set creator: Dr. Julie Zinnert -  
+# Metadata Provider:    - Virginia Coast Reserve Long-Term Ecological Research Project 
+# Contact: Dr. Evan Goldstein -    - ebgold@live.unc.edu
+# Contact:  Elsemarie Mullins -    - elsemar@live.unc.edu
+# Contact:    - Information manager - Virginia Coast Reserve Long-Term Ecological Research Project   - jporter@lternet.edu
+# Stylesheet for metadata conversion into program: John H. Porter, Univ. Virginia, jporter@virginia.edu 
+
+infile1  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-vcr/282/1/c1fee85eafe6fd6cb701cb20b9810263" 
+infile1 <- sub("^https","http",infile1) 
+ dt1 <-read.csv(infile1,header=F 
+          ,skip=1
+            ,sep=","  
+                ,quot='"' 
+        , col.names=c(
+                    "INDEX",     
+                    "LOCATION",     
+                    "STATE",     
+                    "CITATION",     
+                    "YEAR",     
+                    "SPECIES",     
+                    "OBS_TYPE",     
+                    "LONGITUDE",     
+                    "LATITUDE",     
+                    "SELECTEDBYREADER",     
+                    "DOI",     
+                    "JOURNAL",     
+                    "NOTES",     
+                    "NOTES1",     
+                    "NOTES2"    ), check.names=TRUE)
+               
+  
+# Fix any interval or ratio columns mistakenly read in as nominal and nominal columns read as numeric or dates read as strings
+                
+if (class(dt1$INDEX)=="factor") dt1$INDEX <-as.numeric(levels(dt1$INDEX))[as.integer(dt1$INDEX) ]
+if (class(dt1$LOCATION)!="factor") dt1$LOCATION<- as.factor(dt1$LOCATION)
+if (class(dt1$STATE)!="factor") dt1$STATE<- as.factor(dt1$STATE)
+if (class(dt1$CITATION)!="factor") dt1$CITATION<- as.factor(dt1$CITATION)
+if (class(dt1$SPECIES)!="factor") dt1$SPECIES<- as.factor(dt1$SPECIES)
+if (class(dt1$OBS_TYPE)!="factor") dt1$OBS_TYPE<- as.factor(dt1$OBS_TYPE)
+if (class(dt1$LONGITUDE)=="factor") dt1$LONGITUDE <-as.numeric(levels(dt1$LONGITUDE))[as.integer(dt1$LONGITUDE) ]
+if (class(dt1$LATITUDE)=="factor") dt1$LATITUDE <-as.numeric(levels(dt1$LATITUDE))[as.integer(dt1$LATITUDE) ]
+if (class(dt1$SELECTEDBYREADER)!="factor") dt1$SELECTEDBYREADER<- as.factor(dt1$SELECTEDBYREADER)
+if (class(dt1$DOI)!="factor") dt1$DOI<- as.factor(dt1$DOI)
+if (class(dt1$JOURNAL)!="factor") dt1$JOURNAL<- as.factor(dt1$JOURNAL)
+if (class(dt1$NOTES)!="factor") dt1$NOTES<- as.factor(dt1$NOTES)
+if (class(dt1$NOTES1)!="factor") dt1$NOTES1<- as.factor(dt1$NOTES1)
+if (class(dt1$NOTES2)!="factor") dt1$NOTES2<- as.factor(dt1$NOTES2)
+
+# Here is the structure of the input data frame:
+str(dt1)                            
+attach(dt1)                            
+# The analyses below are basic descriptions of the variables. After testing, they should be replaced.                 
+
+summary(INDEX)
+summary(LOCATION)
+summary(STATE)
+summary(CITATION)
+summary(YEAR)
+summary(SPECIES)
+summary(OBS_TYPE)
+summary(LONGITUDE)
+summary(LATITUDE)
+summary(SELECTEDBYREADER)
+summary(DOI)
+summary(JOURNAL)
+summary(NOTES)
+summary(NOTES1)
+summary(NOTES2) 
+detach(dt1)               
+         
+
+plantref <- dt1 
 
 #get lats/longs as numbers
-lat = as.numeric(as.character(plantref$latitude))
-long = as.numeric(as.character(plantref$longitude))
+lat = as.numeric(as.character(plantref$LATITUDE))
+long = as.numeric(as.character(plantref$LONGITUDE))
 
 dois = paste0("'","<a"," href", "=", plantref$DOI , " target = '_blank'", ">", "DOI</a>","'") #create hyperlinks from DOIs
 
@@ -27,24 +106,24 @@ dois = paste0("'","<a"," href", "=", plantref$DOI , " target = '_blank'", ">", "
 pal = colorFactor(c("orange", "blue", "purple"), domain = c(2, 1, 3))
 
 #collapse rows into set of data for pop-up- in text citation, species, obs_type, doi
-plantref_cols = list(plantref$Citation, plantref$location, plantref$species, dois, sep = " ")
+plantref_cols = list(plantref$CITATION, plantref$LOCATION, plantref$SPECIES, dois, sep = " ")
 chunks =do.call(paste, plantref_cols)
 plantref$chunks = chunks
 #aggregate references for those locations
-citations = aggregate(plantref$chunks~plantref$latitude, data = plantref, paste, collapse = "<br>")
+citations = aggregate(plantref$chunks~plantref$LATITUDE, data = plantref, paste, collapse = "<br>")
 
 #####make data set to map from sheet with citations as chunks####
 #find where latitudes line up in plant ref, get longitude
 ##get longitude indices/indicies to get one of 
-longind = match(citations[,1],plantref$latitude)
+longind = match(citations[,1],plantref$LATITUDE)
 ##get longitude values
-longvalues = as.numeric(as.character(plantref$longitude[longind]))
+longvalues = as.numeric(as.character(plantref$LONGITUDE[longind]))
 ##get latitude vlaues
 latvalues = as.numeric(as.character(citations[,1]))
 ##get label as location
-locationlabels = as.character(plantref$location[longind])
+locationlabels = as.character(plantref$LOCATION[longind])
 ##get species and selectedbyreader value at each location
-speciesatlocation = aggregate(plantref$species~plantref$latitude, data = plantref, paste, collapse = ',')
+speciesatlocation = aggregate(plantref$SPECIES~plantref$LATITUDE, data = plantref, paste, collapse = ',')
 
 ###if it has an A, mark as 1, if it has a U, mark as 2, if it has both, mark as 3
 ####find where species are
@@ -61,10 +140,10 @@ Spvec[Usonly] = 2
 Spvec[Bothnum] = 3
 
 ##filled or not filled vector
-#latselectionatlocation = aggregate(plantref$selectedbyreader~plantref$latitude, data = plantref, paste, collapse = ',')
-#longselectionatlocation = aggregate(plantref$selectedbyreader~plantref$longitude, data = plantref, paste, collapse = ',')
+#latselectionatlocation = aggregate(plantref$SELECTEDBYREADER~plantref$LATITUDE, data = plantref, paste, collapse = ',')
+#longselectionatlocation = aggregate(plantref$SELECTEDBYREADER~plantref$LONGITUDE, data = plantref, paste, collapse = ',')
 
-fillvec = (plantref$selectedbyreader[longind] - 1) *-1
+fillvec = (plantref$SELECTEDBYREADER[longind] - 1) *-1
 
 
 #make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
