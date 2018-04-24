@@ -64,7 +64,7 @@ if (class(dt1$SPECIES)!="factor") dt1$SPECIES<- as.factor(dt1$SPECIES)
 if (class(dt1$OBS_TYPE)!="factor") dt1$OBS_TYPE<- as.factor(dt1$OBS_TYPE)
 if (class(dt1$LONGITUDE)=="factor") dt1$LONGITUDE <-as.numeric(levels(dt1$LONGITUDE))[as.integer(dt1$LONGITUDE) ]
 if (class(dt1$LATITUDE)=="factor") dt1$LATITUDE <-as.numeric(levels(dt1$LATITUDE))[as.integer(dt1$LATITUDE) ]
-if (class(dt1$SELECTEDBYREADER)!="factor") dt1$SELECTEDBYREADER<- as.factor(dt1$SELECTEDBYREADER)
+if (class(dt1$SELECTEDBYREADER)!="factor") dt1$SELECTEDBYREADER<- as.numeric(as.character(dt1$SELECTEDBYREADER))
 if (class(dt1$DOI)!="factor") dt1$DOI<- as.factor(dt1$DOI)
 if (class(dt1$JOURNAL)!="factor") dt1$JOURNAL<- as.factor(dt1$JOURNAL)
 if (class(dt1$NOTES)!="factor") dt1$NOTES<- as.factor(dt1$NOTES)
@@ -140,9 +140,8 @@ Spvec[Usonly] = 2
 Spvec[Bothnum] = 3
 
 ##filled or not filled vector
+fillvec = plantref$SELECTEDBYREADER[longind] 
 
-fillvecnum = as.numeric(plantref$SELECTEDBYREADER[longind]) 
-fillvec = (fillvecnum-1)
 
 
 #make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
