@@ -142,7 +142,7 @@ Spvec[Bothnum] = 3
 ##filled or not filled vector
 
 fillvecnum = as.numeric(plantref$SELECTEDBYREADER[longind]) 
-fillvec = (fillvecnum-1)*(-1)
+fillvec = (fillvecnum-1)
 
 
 #make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
