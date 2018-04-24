@@ -53,47 +53,10 @@ infile1 <- sub("^https","http",infile1)
                     "NOTES1",     
                     "NOTES2"    ), check.names=TRUE)
                
-  
-# Fix any interval or ratio columns mistakenly read in as nominal and nominal columns read as numeric or dates read as strings
-                
-if (class(dt1$INDEX)=="factor") dt1$INDEX <-as.numeric(levels(dt1$INDEX))[as.integer(dt1$INDEX) ]
-if (class(dt1$LOCATION)!="factor") dt1$LOCATION<- as.factor(dt1$LOCATION)
-if (class(dt1$STATE)!="factor") dt1$STATE<- as.factor(dt1$STATE)
-if (class(dt1$CITATION)!="factor") dt1$CITATION<- as.factor(dt1$CITATION)
-if (class(dt1$SPECIES)!="factor") dt1$SPECIES<- as.factor(dt1$SPECIES)
-if (class(dt1$OBS_TYPE)!="factor") dt1$OBS_TYPE<- as.factor(dt1$OBS_TYPE)
-if (class(dt1$LONGITUDE)=="factor") dt1$LONGITUDE <-as.numeric(levels(dt1$LONGITUDE))[as.integer(dt1$LONGITUDE) ]
-if (class(dt1$LATITUDE)=="factor") dt1$LATITUDE <-as.numeric(levels(dt1$LATITUDE))[as.integer(dt1$LATITUDE) ]
-if (class(dt1$SELECTEDBYREADER)!="factor") dt1$SELECTEDBYREADER<- as.numeric(as.character(dt1$SELECTEDBYREADER))
-if (class(dt1$DOI)!="factor") dt1$DOI<- as.factor(dt1$DOI)
-if (class(dt1$JOURNAL)!="factor") dt1$JOURNAL<- as.factor(dt1$JOURNAL)
-if (class(dt1$NOTES)!="factor") dt1$NOTES<- as.factor(dt1$NOTES)
-if (class(dt1$NOTES1)!="factor") dt1$NOTES1<- as.factor(dt1$NOTES1)
-if (class(dt1$NOTES2)!="factor") dt1$NOTES2<- as.factor(dt1$NOTES2)
 
 # Here is the structure of the input data frame:
 str(dt1)                            
 attach(dt1)                            
-# The analyses below are basic descriptions of the variables. After testing, they should be replaced.                 
-
-summary(INDEX)
-summary(LOCATION)
-summary(STATE)
-summary(CITATION)
-summary(YEAR)
-summary(SPECIES)
-summary(OBS_TYPE)
-summary(LONGITUDE)
-summary(LATITUDE)
-summary(SELECTEDBYREADER)
-summary(DOI)
-summary(JOURNAL)
-summary(NOTES)
-summary(NOTES1)
-summary(NOTES2) 
-detach(dt1)               
-         
-
 plantref <- dt1 
 
 #get lats/longs as numbers
@@ -140,9 +103,8 @@ Spvec[Usonly] = 2
 Spvec[Bothnum] = 3
 
 ##filled or not filled vector
-fillvec = plantref$SELECTEDBYREADER[longind] 
-
-
+fillvecnum = as.numeric(as.character(plantref$SELECTEDBYREADER[longind]))
+fillvec = (fillvecnum-1)*-1
 
 #make plant map using lat, long, color marker by species, filling by whether location was chosen by reader or not
 #and include popup with link to paper      
