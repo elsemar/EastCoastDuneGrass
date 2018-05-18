@@ -3,8 +3,8 @@ This code accompanies a geographic literature review of the dune grasses Ammophi
 Locations of the grasses are noted and this code maps those references. 
 The code generates an HTML file (a leaflet map) that can be opened using a browser, and the map has active links to scientific articles.
 
-Data called in this code is available here:
-https://doi.org/10.6073/pasta/bdbe9a609e0508fdb7e39bc41f75bf6f
+Data called is available here: [![Identifier](https://img.shields.io/badge/DOI-10.6073%2Fpasta%2Fbdbe9a609e0508fdb7e39bc41f75bf6f-ff69b4.svg)](https://doi.org/10.6073/pasta/bdbe9a609e0508fdb7e39bc41f75bf6f)
+
 
 A release of this code is available here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1228461.svg)](https://doi.org/10.5281/zenodo.1228461)
 
