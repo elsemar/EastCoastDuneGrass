@@ -8,4 +8,6 @@ Data called is available here: [![Identifier](https://img.shields.io/badge/DOI-1
 
 A release of this code is available here: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1228461.svg)](https://doi.org/10.5281/zenodo.1228461)
 
-The code release was created for a manuscript that is currently in review.
+The code release was created for this manuscript:
+
+Goldstein EB, Mullins EV, Moore LJ, Biel RG, Brown JK, Hacker SD, Jay KR, Mostow RS, Ruggiero P, Zinnert JC. (2018) Literature-based latitudinal distribution and possible range shifts of two US east coast dune grass species (Uniola paniculata and Ammophila breviligulata) PeerJ 6:e4932 [![Identifier](https://img.shields.io/badge/DOI-10.7717%2Fpeerj.4932-blue.svg)](https://doi.org/10.7717/peerj.4932)
